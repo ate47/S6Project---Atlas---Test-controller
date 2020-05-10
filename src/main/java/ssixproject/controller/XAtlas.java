@@ -3,6 +3,8 @@ package ssixproject.controller;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import javax.swing.SwingUtilities;
+
 import com.studiohartman.jamepad.ControllerAxis;
 import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerManager;
@@ -10,6 +12,7 @@ import com.studiohartman.jamepad.ControllerUnpluggedException;
 
 import ssixproject.client.GamePhase;
 import ssixproject.client.PlayerData;
+import ssixproject.controller.window.GameWindow;
 import ssixprojet.server.packet.PacketHandler;
 import ssixprojet.server.packet.PacketManager;
 import ssixprojet.server.packet.client.PacketC04Move;
@@ -27,6 +30,7 @@ public class XAtlas {
 	public final Config config;
 	public final PacketHandler packetHandler;
 	public final PacketManager packetManager = new PacketManager();
+	private GameWindow window;
 
 	private boolean started = true;
 
@@ -35,6 +39,7 @@ public class XAtlas {
 		manager.initSDLGamepad();
 		index = manager.getControllerIndex(0);
 		packetHandler = new PacketHandler(this);
+		window = new GameWindow(playerData);
 	}
 
 	public boolean isStarted() {
@@ -54,12 +59,15 @@ public class XAtlas {
 	}
 
 	public void start() {
+		window.setVisible(true);
 		packetHandler.start();
 		final long rate = 1000 / 20;
 		while (started) {
 			long start = System.currentTimeMillis();
 
 			Runnable r;
+
+			SwingUtilities.invokeLater(window::repaint);
 
 			while ((r = actions.poll()) != null) {
 				r.run();
