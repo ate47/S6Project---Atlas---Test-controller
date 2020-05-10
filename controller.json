@@ -1,0 +1,6 @@
+{
+  "serverHost": "127.0.0.1",
+  "serverPort": 2080,
+  "serverAddress": "127.0.0.1:2080",
+  "username": "ATE"
+}

@@ -1,0 +1,21 @@
+plugins {
+    id 'java-library'
+}
+
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    // networks
+    implementation 'io.netty:netty-all:4.0.56.Final'
+    implementation 'commons-io:commons-io:2.4'
+    
+	// reader
+  	implementation 'com.google.code.gson:gson:2.8.6'
+  	
+    // controller
+	compile 'com.github.WilliamAHartman:Jamepad:1.4.0'
+	compile 'uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.4'
+}
