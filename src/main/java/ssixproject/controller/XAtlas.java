@@ -12,6 +12,7 @@ import com.studiohartman.jamepad.ControllerUnpluggedException;
 
 import ssixproject.client.GamePhase;
 import ssixproject.client.PlayerData;
+import ssixproject.client.PlayerType;
 import ssixproject.controller.window.GameWindow;
 import ssixprojet.server.packet.PacketHandler;
 import ssixprojet.server.packet.PacketManager;
@@ -99,7 +100,7 @@ public class XAtlas {
 						} else
 							packetHandler.sendPacket(new PacketC04Move(lx, ly, lx, ly));
 
-						if (rd > 0.75F) {
+						if (playerData.type == PlayerType.SURVIVOR && rd > 0.75F) {
 							packetHandler.sendPacket(new PacketC05Shot());
 							index.doVibration(0.25F, 0.25F, (int) rate);
 						}
