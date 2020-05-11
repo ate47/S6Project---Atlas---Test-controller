@@ -55,7 +55,7 @@ public class Config {
 		JTextField address = new JTextField(cfg.serverAddress);
 		address.setBounds(20, 160, 360, 40);
 
-		Integer[] count = new Integer[20];
+		Integer[] count = new Integer[200];
 
 		for (int i = 0; i < count.length; i++)
 			count[i] = i + 1;
