@@ -27,6 +27,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import ssixproject.client.PlayerData;
 import ssixproject.controller.XAtlas;
 import ssixprojet.server.packet.client.PacketC00ConnectPlayer;
 import ssixprojet.server.packet.client.PacketC03ReconnectPlayer;
@@ -53,10 +54,10 @@ public class PacketHandler extends Thread {
 				try {
 					handshaker.finishHandshake(ctx.channel(), (FullHttpResponse) msg);
 					System.out.println("WebSocket Client connected!");
-					if (xAtlas.playerData.playerUUID != null) {
-						sendPacket(new PacketC03ReconnectPlayer(xAtlas.playerData.playerUUID, xAtlas.config.username));
+					if (data.playerUUID != null) {
+						sendPacket(new PacketC03ReconnectPlayer(data.playerUUID, data.username));
 					} else {
-						sendPacket(new PacketC00ConnectPlayer(xAtlas.config.username));
+						sendPacket(new PacketC00ConnectPlayer(data.username));
 					}
 				} catch (WebSocketHandshakeException e) {
 					System.out.println("WebSocket Client failed to connect");
@@ -84,7 +85,7 @@ public class PacketHandler extends Thread {
 			xAtlas.doAction(() -> {
 				// System.out.println(packet);
 				try {
-					packet.handle(xAtlas);
+					packet.handle(data);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -98,17 +99,23 @@ public class PacketHandler extends Thread {
 
 	}
 
+	private PlayerData data;
 	private XAtlas xAtlas;
 	private Channel channel;
 	private URI uri;
 
-	public PacketHandler(XAtlas xAtlas) {
+	public PacketHandler(XAtlas xAtlas, PlayerData data) {
 		this.xAtlas = xAtlas;
+		this.data = data;
 		try {
 			uri = new URI("ws://" + xAtlas.config.serverHost + ":" + xAtlas.config.serverPort + "/game");
 		} catch (URISyntaxException e) {
 			throw new IllegalArgumentException(e);
 		}
+	}
+
+	public PlayerData getData() {
+		return data;
 	}
 
 	@Override

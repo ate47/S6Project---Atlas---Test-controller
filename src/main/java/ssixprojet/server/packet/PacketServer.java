@@ -1,6 +1,6 @@
 package ssixprojet.server.packet;
 
-import ssixproject.controller.XAtlas;
+import ssixproject.client.PlayerData;
 
 public abstract class PacketServer implements Packet {
 
@@ -10,5 +10,5 @@ public abstract class PacketServer implements Packet {
 	 * @throws Exception
 	 *             if the packet throw an exception
 	 */
-	public abstract void handle(XAtlas src) throws Exception;
+	public abstract void handle(PlayerData data) throws Exception;
 }

@@ -3,7 +3,7 @@ package ssixprojet.server.packet.server;
 import java.util.UUID;
 
 import io.netty.buffer.ByteBuf;
-import ssixproject.controller.XAtlas;
+import ssixproject.client.PlayerData;
 import ssixprojet.server.packet.PacketManager;
 import ssixprojet.server.packet.PacketServer;
 
@@ -26,10 +26,10 @@ public class PacketS02PlayerRegister extends PacketServer {
 	}
 
 	@Override
-	public void handle(XAtlas src) throws Exception {
-		src.playerData.playerUUID = playerUUID;
-		src.playerData.id = id;
-		System.out.println("id: " + playerUUID + ", " + id);
+	public void handle(PlayerData playerData) throws Exception {
+		playerData.playerUUID = playerUUID;
+		playerData.id = id;
+		playerData.log("id: " + playerUUID + ", " + id);
 	}
 
 }

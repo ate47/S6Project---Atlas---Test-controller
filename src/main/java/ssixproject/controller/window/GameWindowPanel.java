@@ -3,6 +3,7 @@ package ssixproject.controller.window;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.util.function.Supplier;
 
 import javax.swing.JPanel;
 
@@ -25,9 +26,9 @@ public class GameWindowPanel extends JPanel {
 		return metrics.stringWidth(text);
 	}
 
-	private final PlayerData data;
+	private final Supplier<PlayerData> data;
 
-	public GameWindowPanel(PlayerData data) {
+	public GameWindowPanel(Supplier<PlayerData> data) {
 		super(null);
 		this.data = data;
 		setBackground(Color.WHITE);
@@ -39,6 +40,7 @@ public class GameWindowPanel extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		PlayerData data = this.data.get();
 		int windowWidth = getWidth();
 		int windowHeight = getHeight();
 		switch (data.phase) {

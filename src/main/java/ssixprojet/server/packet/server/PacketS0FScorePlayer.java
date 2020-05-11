@@ -1,7 +1,7 @@
 package ssixprojet.server.packet.server;
 
 import io.netty.buffer.ByteBuf;
-import ssixproject.controller.XAtlas;
+import ssixproject.client.PlayerData;
 import ssixprojet.server.packet.PacketServer;
 
 public class PacketS0FScorePlayer extends PacketServer {
@@ -32,14 +32,14 @@ public class PacketS0FScorePlayer extends PacketServer {
 	}
 
 	@Override
-	public void handle(XAtlas src) throws Exception {
-		src.playerData.infectionSortId = infectionSortId;
-		src.playerData.survivorSortId = survivorSortId;
-		src.playerData.damageGiven = damageGiven;
-		src.playerData.damageTaken = damageTaken;
-		src.playerData.death = death;
-		src.playerData.kills = kills;
-		src.playerData.infections = infections;
-		src.playerData.timeAlive = timeAlive;
+	public void handle(PlayerData playerData) throws Exception {
+		playerData.infectionSortId = infectionSortId;
+		playerData.survivorSortId = survivorSortId;
+		playerData.damageGiven = damageGiven;
+		playerData.damageTaken = damageTaken;
+		playerData.death = death;
+		playerData.kills = kills;
+		playerData.infections = infections;
+		playerData.timeAlive = timeAlive;
 	}
 }

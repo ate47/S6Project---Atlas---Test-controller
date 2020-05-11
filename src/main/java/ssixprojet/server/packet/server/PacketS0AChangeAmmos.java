@@ -1,7 +1,7 @@
 package ssixprojet.server.packet.server;
 
 import io.netty.buffer.ByteBuf;
-import ssixproject.controller.XAtlas;
+import ssixproject.client.PlayerData;
 import ssixprojet.server.packet.PacketServer;
 
 public class PacketS0AChangeAmmos extends PacketServer {
@@ -19,7 +19,7 @@ public class PacketS0AChangeAmmos extends PacketServer {
 	}
 
 	@Override
-	public void handle(XAtlas src) throws Exception {
-		src.playerData.ammos = ammos;
+	public void handle(PlayerData playerData) throws Exception {
+		playerData.ammos = ammos;
 	}
 }

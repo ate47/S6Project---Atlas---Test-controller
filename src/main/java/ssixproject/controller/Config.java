@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.Reader;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,7 +41,7 @@ public class Config {
 
 		JFrame frame = new JFrame("XAtlas");
 		frame.setLocationRelativeTo(null);
-		frame.setSize(400, 320);
+		frame.setSize(400, 420);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -55,8 +56,17 @@ public class Config {
 		JTextField address = new JTextField(cfg.serverAddress);
 		address.setBounds(20, 160, 360, 40);
 
+		Integer[] count = new Integer[20];
+
+		for (int i = 0; i < count.length; i++)
+			count[i] = i + 1;
+
+		JComboBox<Integer> playerCount = new JComboBox<>(count);
+		playerCount.setBounds(20, 240, 360, 40);
+		playerCount.setSelectedIndex(cfg.playerCount > 0 && cfg.playerCount <= count.length ? cfg.playerCount - 1 : 0);
+
 		JButton launch = new JButton("Lancer");
-		launch.setBounds(20, 240, 360, 40);
+		launch.setBounds(20, 320, 360, 40);
 		launch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -72,6 +82,8 @@ public class Config {
 				}
 
 				cfg.username = username.getText();
+				Integer item = (Integer) playerCount.getSelectedItem();
+				cfg.playerCount = item == null ? 1 : item.intValue();
 				frame.setVisible(false);
 				synchronized (cfg) {
 					cfg.notify();
@@ -86,6 +98,7 @@ public class Config {
 		panel.add(username);
 		panel.add(addressLabel);
 		panel.add(address);
+		panel.add(playerCount);
 		panel.add(launch);
 
 		frame.setContentPane(panel);
@@ -106,6 +119,7 @@ public class Config {
 	public int serverPort = 2080;
 	public String serverAddress = serverHost + ":" + serverPort;
 	public String username = "XPlayer";
+	public int playerCount = 1;
 
 	/**
 	 * save the config to the config file

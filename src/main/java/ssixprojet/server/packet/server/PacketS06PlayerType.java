@@ -1,8 +1,8 @@
 package ssixprojet.server.packet.server;
 
 import io.netty.buffer.ByteBuf;
+import ssixproject.client.PlayerData;
 import ssixproject.client.PlayerType;
-import ssixproject.controller.XAtlas;
 import ssixprojet.server.packet.PacketServer;
 
 public class PacketS06PlayerType extends PacketServer {
@@ -20,8 +20,8 @@ public class PacketS06PlayerType extends PacketServer {
 	}
 
 	@Override
-	public void handle(XAtlas src) throws Exception {
-		src.playerData.type = PlayerType.values()[type];
+	public void handle(PlayerData playerData) throws Exception {
+		playerData.type = PlayerType.values()[type];
 	}
 
 }

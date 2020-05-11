@@ -6,6 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.SwingUtilities;
 
 import com.studiohartman.jamepad.ControllerAxis;
+import com.studiohartman.jamepad.ControllerButton;
 import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerUnpluggedException;
@@ -25,11 +26,11 @@ public class XAtlas {
 	}
 
 	private final BlockingQueue<Runnable> actions = new ArrayBlockingQueue<>(1024);
-	public final PlayerData playerData = new PlayerData();
+	public final PacketHandler[] handlers;
+	private int selectedHandler = 0;
 	private final ControllerManager manager = new ControllerManager();
 	private final ControllerIndex index;
 	public final Config config;
-	public final PacketHandler packetHandler;
 	public final PacketManager packetManager = new PacketManager();
 	private GameWindow window;
 
@@ -39,12 +40,39 @@ public class XAtlas {
 		this.config = config;
 		manager.initSDLGamepad();
 		index = manager.getControllerIndex(0);
-		packetHandler = new PacketHandler(this);
-		window = new GameWindow(playerData);
+		handlers = new PacketHandler[config.playerCount];
+		if (config.playerCount == 1) {
+			handlers[0] = new PacketHandler(this, new PlayerData(config.username));
+		} else
+			for (int i = 0; i < handlers.length; i++)
+				handlers[i] = new PacketHandler(this, new PlayerData(config.username + " #" + (i + 1)));
+		window = new GameWindow(() -> getSelectedHandler().getData());
 	}
 
 	public boolean isStarted() {
 		return started;
+	}
+
+	public synchronized PacketHandler getSelectedHandler() {
+		return handlers[selectedHandler];
+	}
+
+	public synchronized PacketHandler selectHandler(int handlerID) {
+		PacketHandler handler = handlers[selectedHandler = handlerID];
+		handler.getData().log("Selected");
+		return handler;
+	}
+
+	public synchronized PacketHandler selectNextHandler() {
+		PacketHandler handler = handlers[selectedHandler = (selectedHandler + 1) % handlers.length];
+		handler.getData().log("Selected");
+		return handler;
+	}
+
+	public synchronized PacketHandler selectLastHandler() {
+		PacketHandler handler = handlers[selectedHandler = (selectedHandler - 1 + handlers.length) % handlers.length];
+		handler.getData().log("Selected");
+		return handler;
 	}
 
 	private void sleepNE(long millis) {
@@ -61,7 +89,8 @@ public class XAtlas {
 
 	public void start() {
 		window.setVisible(true);
-		packetHandler.start();
+		for (PacketHandler packetHandler : handlers)
+			packetHandler.start();
 		final long rate = 1000 / 20;
 		while (started) {
 			long start = System.currentTimeMillis();
@@ -74,8 +103,19 @@ public class XAtlas {
 				r.run();
 			}
 
-			if (playerData.phase == GamePhase.PLAYING)
-				try {
+			try {
+				PacketHandler packetHandler;
+
+				if (index.isButtonJustPressed(ControllerButton.A)) {
+					packetHandler = selectNextHandler();
+				} else if (index.isButtonJustPressed(ControllerButton.B)) {
+					packetHandler = selectLastHandler();
+				} else
+					packetHandler = getSelectedHandler();
+
+				PlayerData playerData = packetHandler.getData();
+
+				if (playerData.phase == GamePhase.PLAYING) {
 					float lx = index.getAxisState(ControllerAxis.LEFTX);
 					float ly = -index.getAxisState(ControllerAxis.LEFTY);
 					float rx = index.getAxisState(ControllerAxis.RIGHTX);
@@ -105,9 +145,10 @@ public class XAtlas {
 							index.doVibration(0.25F, 0.25F, (int) rate);
 						}
 					}
-				} catch (ControllerUnpluggedException e) {
-					System.out.println("Il faut brancher une manette!");
 				}
+			} catch (ControllerUnpluggedException e) {
+				System.out.println("Il faut brancher une manette!");
+			}
 
 			long deltaTime = start + rate - System.currentTimeMillis();
 			if (deltaTime > 0)
