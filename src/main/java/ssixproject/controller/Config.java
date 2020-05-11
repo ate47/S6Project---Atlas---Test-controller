@@ -40,8 +40,7 @@ public class Config {
 		Config cfg = loadFromFile();
 
 		JFrame frame = new JFrame("XAtlas");
-		frame.setLocationRelativeTo(null);
-		frame.setSize(400, 420);
+		frame.setSize(400, 520);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -65,8 +64,13 @@ public class Config {
 		playerCount.setBounds(20, 240, 360, 40);
 		playerCount.setSelectedIndex(cfg.playerCount > 0 && cfg.playerCount <= count.length ? cfg.playerCount - 1 : 0);
 
+		JLabel masterLabel = new JLabel("Mot de passe master");
+		masterLabel.setBounds(20, 320, 360, 40);
+		JTextField masterPassword = new JTextField(cfg.masterPassword);
+		masterPassword.setBounds(20, 360, 360, 40);
+
 		JButton launch = new JButton("Lancer");
-		launch.setBounds(20, 320, 360, 40);
+		launch.setBounds(20, 440, 360, 40);
 		launch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -84,6 +88,7 @@ public class Config {
 				cfg.username = username.getText();
 				Integer item = (Integer) playerCount.getSelectedItem();
 				cfg.playerCount = item == null ? 1 : item.intValue();
+				cfg.masterPassword = masterPassword.getText();
 				frame.setVisible(false);
 				synchronized (cfg) {
 					cfg.notify();
@@ -99,6 +104,8 @@ public class Config {
 		panel.add(addressLabel);
 		panel.add(address);
 		panel.add(playerCount);
+		panel.add(masterLabel);
+		panel.add(masterPassword);
 		panel.add(launch);
 
 		frame.setContentPane(panel);
@@ -119,6 +126,7 @@ public class Config {
 	public int serverPort = 2080;
 	public String serverAddress = serverHost + ":" + serverPort;
 	public String username = "XPlayer";
+	public String masterPassword = "";
 	public int playerCount = 1;
 
 	/**

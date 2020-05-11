@@ -8,15 +8,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import ssixprojet.server.packet.Packet.PacketBuilder;
-import ssixprojet.server.packet.server.PacketS02PlayerRegister;
-import ssixprojet.server.packet.server.PacketS06PlayerType;
-import ssixprojet.server.packet.server.PacketS09ChangeHealth;
-import ssixprojet.server.packet.server.PacketS0AChangeAmmos;
-import ssixprojet.server.packet.server.PacketS0BSetGamePhase;
-import ssixprojet.server.packet.server.PacketS0ETimeToWaitPing;
-import ssixprojet.server.packet.server.PacketS0FScorePlayer;
 
-public class PacketManager {
+public class PacketManager<D> {
 	/**
 	 * read an UTF8 string from a buffer
 	 * 
@@ -53,17 +46,9 @@ public class PacketManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	private PacketBuilder<? extends PacketServer>[] packets = new PacketBuilder[256];
+	private PacketBuilder<? extends PacketServer<D>>[] packets = new PacketBuilder[256];
 
-	public PacketManager() {
-		registerPacket(0x02, PacketS02PlayerRegister::create);
-		registerPacket(0x06, PacketS06PlayerType::create);
-		registerPacket(0x09, PacketS09ChangeHealth::create);
-		registerPacket(0x0A, PacketS0AChangeAmmos::create);
-		registerPacket(0x0B, PacketS0BSetGamePhase::create);
-		registerPacket(0x0E, PacketS0ETimeToWaitPing::create);
-		registerPacket(0x0F, PacketS0FScorePlayer::create);
-	}
+	public PacketManager() {}
 
 	/**
 	 * build a packet from a {@link TextWebSocketFrame}
@@ -72,7 +57,7 @@ public class PacketManager {
 	 *            the frame
 	 * @return the packet or null if an error occurred
 	 */
-	public PacketServer buildPacket(BinaryWebSocketFrame frame) {
+	public PacketServer<D> buildPacket(BinaryWebSocketFrame frame) {
 		ByteBuf buffer = frame.content();
 		try {
 			if (!buffer.isReadable(4))
@@ -85,18 +70,18 @@ public class PacketManager {
 		}
 	}
 
-	public PacketServer buildPacket(int type, ByteBuf buffer) {
+	public PacketServer<D> buildPacket(int type, ByteBuf buffer) {
 		if (type < 0 || type >= packets.length) {
 			return null;
 		}
 		// get the packet builder for this type
-		PacketBuilder<?> bld = packets[type];
+		PacketBuilder<? extends PacketServer<D>> bld = packets[type];
 		if (bld == null) {
 			return null;
 		}
 
 		// build the packet and release the buffer data
-		return (PacketServer) bld.build(buffer);
+		return bld.build(buffer);
 	}
 
 	/**
@@ -107,7 +92,7 @@ public class PacketManager {
 	 * @param builder
 	 *            the builder
 	 */
-	public void registerPacket(int packetId, PacketBuilder<? extends PacketServer> builder) {
+	public void registerPacket(int packetId, PacketBuilder<? extends PacketServer<D>> builder) {
 		if (packets.length <= packetId || packetId < 0)
 			throw new IllegalArgumentException("Bad packet id");
 		if (packets[packetId] != null)

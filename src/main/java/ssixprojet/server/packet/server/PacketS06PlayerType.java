@@ -5,7 +5,7 @@ import ssixproject.client.PlayerData;
 import ssixproject.client.PlayerType;
 import ssixprojet.server.packet.PacketServer;
 
-public class PacketS06PlayerType extends PacketServer {
+public class PacketS06PlayerType extends PacketServer<PlayerData> {
 	public static PacketS06PlayerType create(ByteBuf buf) {
 		if (!buf.isReadable(4))
 			return null;

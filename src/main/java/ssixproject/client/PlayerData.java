@@ -2,7 +2,7 @@ package ssixproject.client;
 
 import java.util.UUID;
 
-public class PlayerData {
+public class PlayerData extends Data {
 	public final String username;
 	public UUID playerUUID = null;
 	public int health = 100;
@@ -17,8 +17,6 @@ public class PlayerData {
 	public int kills = 0;
 	public int timeAlive = 0;
 	public int id = 0;
-	public int timeToWait = 0;
-	public GamePhase phase = GamePhase.WAITING;
 
 	public PlayerData(String username) {
 		this.username = username;

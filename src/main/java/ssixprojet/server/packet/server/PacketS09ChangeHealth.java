@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import ssixproject.client.PlayerData;
 import ssixprojet.server.packet.PacketServer;
 
-public class PacketS09ChangeHealth extends PacketServer {
+public class PacketS09ChangeHealth extends PacketServer<PlayerData> {
 	public static PacketS09ChangeHealth create(ByteBuf buf) {
 		if (!buf.isReadable(4))
 			return null;

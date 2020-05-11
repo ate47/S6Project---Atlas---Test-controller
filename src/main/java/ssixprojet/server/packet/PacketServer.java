@@ -1,8 +1,6 @@
 package ssixprojet.server.packet;
 
-import ssixproject.client.PlayerData;
-
-public abstract class PacketServer implements Packet {
+public abstract class PacketServer<D> implements Packet {
 
 	/**
 	 * handle the packet
@@ -10,5 +8,5 @@ public abstract class PacketServer implements Packet {
 	 * @throws Exception
 	 *             if the packet throw an exception
 	 */
-	public abstract void handle(PlayerData data) throws Exception;
+	public abstract void handle(D data) throws Exception;
 }

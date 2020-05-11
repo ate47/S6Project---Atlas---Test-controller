@@ -1,16 +1,16 @@
 package ssixprojet.server.packet.server;
 
 import io.netty.buffer.ByteBuf;
+import ssixproject.client.Data;
 import ssixproject.client.GamePhase;
-import ssixproject.client.PlayerData;
 import ssixprojet.server.packet.PacketServer;
 
-public class PacketS0BSetGamePhase extends PacketServer {
-	public static PacketS0BSetGamePhase create(ByteBuf buf) {
+public class PacketS0BSetGamePhase<D extends Data> extends PacketServer<D> {
+	public static <D extends Data> PacketS0BSetGamePhase<D> create(ByteBuf buf) {
 		if (!buf.isReadable(4))
 			return null;
 
-		return new PacketS0BSetGamePhase(GamePhase.values()[buf.readInt()]);
+		return new PacketS0BSetGamePhase<>(GamePhase.values()[buf.readInt()]);
 	}
 
 	private GamePhase phase;
@@ -20,7 +20,7 @@ public class PacketS0BSetGamePhase extends PacketServer {
 	}
 
 	@Override
-	public void handle(PlayerData playerData) throws Exception {
+	public void handle(D playerData) throws Exception {
 		playerData.phase = phase;
 	}
 

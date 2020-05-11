@@ -27,12 +27,9 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
-import ssixproject.client.PlayerData;
 import ssixproject.controller.XAtlas;
-import ssixprojet.server.packet.client.PacketC00ConnectPlayer;
-import ssixprojet.server.packet.client.PacketC03ReconnectPlayer;
 
-public class PacketHandler extends Thread {
+public abstract class PacketHandler<D> extends Thread {
 
 	private class PacketHandlerChannelHandler extends ChannelInboundHandlerAdapter {
 		private WebSocketClientHandshaker handshaker;
@@ -54,11 +51,7 @@ public class PacketHandler extends Thread {
 				try {
 					handshaker.finishHandshake(ctx.channel(), (FullHttpResponse) msg);
 					System.out.println("WebSocket Client connected!");
-					if (data.playerUUID != null) {
-						sendPacket(new PacketC03ReconnectPlayer(data.playerUUID, data.username));
-					} else {
-						sendPacket(new PacketC00ConnectPlayer(data.username));
-					}
+					onOpen();
 				} catch (WebSocketHandshakeException e) {
 					System.out.println("WebSocket Client failed to connect");
 				}
@@ -78,7 +71,7 @@ public class PacketHandler extends Thread {
 		}
 
 		protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) {
-			PacketServer packet = xAtlas.packetManager.buildPacket(frame);
+			PacketServer<D> packet = packetManager.buildPacket(frame);
 			if (packet == null) {
 				return;
 			}
@@ -99,13 +92,15 @@ public class PacketHandler extends Thread {
 
 	}
 
-	private PlayerData data;
+	private PacketManager<D> packetManager;
+	protected final D data;
 	private XAtlas xAtlas;
 	private Channel channel;
 	private URI uri;
 
-	public PacketHandler(XAtlas xAtlas, PlayerData data) {
+	public PacketHandler(XAtlas xAtlas, PacketManager<D> packetManager, D data) {
 		this.xAtlas = xAtlas;
+		this.packetManager = packetManager;
 		this.data = data;
 		try {
 			uri = new URI("ws://" + xAtlas.config.serverHost + ":" + xAtlas.config.serverPort + "/game");
@@ -114,7 +109,7 @@ public class PacketHandler extends Thread {
 		}
 	}
 
-	public PlayerData getData() {
+	public D getData() {
 		return data;
 	}
 
@@ -161,6 +156,8 @@ public class PacketHandler extends Thread {
 			workerGroup.shutdownGracefully();
 		}
 	}
+
+	public abstract void onOpen();
 
 	public synchronized void sendPacket(PacketClient packet) {
 		if (channel == null)

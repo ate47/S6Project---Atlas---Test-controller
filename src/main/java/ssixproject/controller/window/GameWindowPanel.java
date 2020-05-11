@@ -12,7 +12,7 @@ import ssixproject.client.PlayerData;
 public class GameWindowPanel extends JPanel {
 	private static final long serialVersionUID = -7220370717863638605L;
 
-	private static void drawCenteredString(Graphics g, String text, int x, int y) {
+	public static void drawCenteredString(Graphics g, String text, int x, int y) {
 		FontMetrics metrics = g.getFontMetrics(g.getFont());
 		int cx = x - metrics.stringWidth(text) / 2;
 		// Determine the Y coordinate for the text (note we add the ascent, as in java
@@ -45,8 +45,11 @@ public class GameWindowPanel extends JPanel {
 		int windowHeight = getHeight();
 		switch (data.phase) {
 		case WAITING:
+			// display background
+			g.setColor(SURVIVOR_COLOR);
+			g.fillRect(0, 0, windowWidth, windowHeight);
 			g.setFont(g.getFont().deriveFont(20F));
-			g.setColor(Color.BLACK);
+			g.setColor(Color.WHITE);
 			drawCenteredString(g, "En attente de lancement...", windowWidth / 2, windowHeight / 2);
 			break;
 		case PLAYING:
@@ -97,6 +100,10 @@ public class GameWindowPanel extends JPanel {
 				g.setColor(Color.WHITE);
 				drawCenteredString(g, txt, windowWidth / 2, windowHeight / 20);
 			}
+
+			g.setColor(Color.WHITE);
+			g.setFont(g.getFont().deriveFont(windowWidth / 5F));
+			drawCenteredString(g, String.valueOf(data.id), windowWidth / 2, windowHeight * 3 / 5);
 			break;
 		case SCORE:
 			switch (data.type) {
@@ -112,6 +119,10 @@ public class GameWindowPanel extends JPanel {
 			g.fillRect(0, 0, windowWidth, windowHeight);
 			break;
 		}
+
+		g.setColor(Color.WHITE);
+		g.setFont(g.getFont().deriveFont(windowWidth / 25F));
+		drawCenteredString(g, data.username, windowWidth / 2, windowHeight * 9 / 10);
 	}
 
 }

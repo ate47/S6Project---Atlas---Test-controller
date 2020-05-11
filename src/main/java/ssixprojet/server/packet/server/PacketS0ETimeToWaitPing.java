@@ -1,14 +1,14 @@
 package ssixprojet.server.packet.server;
 
 import io.netty.buffer.ByteBuf;
-import ssixproject.client.PlayerData;
+import ssixproject.client.Data;
 import ssixprojet.server.packet.PacketServer;
 
-public class PacketS0ETimeToWaitPing extends PacketServer {
-	public static PacketS0ETimeToWaitPing create(ByteBuf buf) {
+public class PacketS0ETimeToWaitPing<D extends Data> extends PacketServer<D> {
+	public static <D extends Data> PacketS0ETimeToWaitPing<D> create(ByteBuf buf) {
 		if (!buf.isReadable(4))
 			return null;
-		return new PacketS0ETimeToWaitPing(buf.readInt());
+		return new PacketS0ETimeToWaitPing<>(buf.readInt());
 	}
 
 	private int time;
@@ -18,7 +18,7 @@ public class PacketS0ETimeToWaitPing extends PacketServer {
 	}
 
 	@Override
-	public void handle(PlayerData playerData) throws Exception {
+	public void handle(D playerData) throws Exception {
 		playerData.timeToWait = time;
 	}
 }
