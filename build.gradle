@@ -1,6 +1,16 @@
-plugins {
-    id 'java-library'
+buildscript {
+    repositories {
+		jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
+    }
 }
+
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = 1.8
 
 repositories {
     jcenter()
@@ -18,4 +28,10 @@ dependencies {
     // controller
 	compile 'com.github.WilliamAHartman:Jamepad:1.4.0'
 	compile 'uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.4'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "ssixproject.controller.XAtlas"
+    }
 }
