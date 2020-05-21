@@ -79,11 +79,14 @@ public class Config {
 					return;
 				cfg.serverAddress = address.getText();
 				cfg.serverHost = add[0];
-				try {
-					cfg.serverPort = Integer.valueOf(add[1]);
-				} catch (Exception e2) {
-					return;
-				}
+				if (add.length == 1)
+					cfg.serverPort = 80;
+				else
+					try {
+						cfg.serverPort = Integer.valueOf(add[1]);
+					} catch (Exception e2) {
+						return;
+					}
 
 				cfg.username = username.getText();
 				Integer item = (Integer) playerCount.getSelectedItem();
