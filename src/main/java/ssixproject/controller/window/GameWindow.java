@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 
 import ssixproject.client.MasterData;
 import ssixproject.client.PlayerData;
+import ssixproject.controller.XAtlas;
 
 public class GameWindow extends JFrame {
 	private static final long serialVersionUID = -7220370717863638605L;
@@ -14,12 +15,12 @@ public class GameWindow extends JFrame {
 	private JPanel game, master;
 	private boolean masterSelected = false;
 
-	public GameWindow(Supplier<PlayerData> data, MasterData master) {
+	public GameWindow(Supplier<PlayerData> data, MasterData master, XAtlas xatlas) {
 		super("XAtlas Client");
 		setResizable(false);
 		setSize(800, 500);
 		setLocationRelativeTo(null);
-		this.game = new GameWindowPanel(data);
+		this.game = new GameWindowPanel(data, xatlas);
 		this.master = master == null ? null : new MasterWindowPanel(master);
 
 		this.game.setSize(getSize());

@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import javax.swing.JPanel;
 
 import ssixproject.client.PlayerData;
+import ssixproject.controller.XAtlas;
 
 public class GameWindowPanel extends JPanel {
 	private static final long serialVersionUID = -7220370717863638605L;
@@ -27,10 +28,12 @@ public class GameWindowPanel extends JPanel {
 	}
 
 	private final Supplier<PlayerData> data;
+	private final XAtlas xatlas;
 
-	public GameWindowPanel(Supplier<PlayerData> data) {
+	public GameWindowPanel(Supplier<PlayerData> data, XAtlas xatlas) {
 		super(null);
 		this.data = data;
+		this.xatlas = xatlas;
 		setBackground(Color.WHITE);
 	}
 
@@ -104,6 +107,9 @@ public class GameWindowPanel extends JPanel {
 			g.setColor(Color.WHITE);
 			g.setFont(g.getFont().deriveFont(windowWidth / 5F));
 			drawCenteredString(g, String.valueOf(data.id), windowWidth / 2, windowHeight * 3 / 5);
+			g.setFont(g.getFont().deriveFont(windowWidth / 30F));
+			if (xatlas.isDancingModeEnabled())
+				drawCenteredString(g, "Dancing mode enabled", windowWidth / 2, 8 * windowHeight / 9);
 			break;
 		case SCORE:
 			switch (data.type) {

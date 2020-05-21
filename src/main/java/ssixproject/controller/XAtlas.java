@@ -49,7 +49,7 @@ public class XAtlas {
 	public final PacketManager<PlayerData> playerPacketManager;
 	public final PacketManager<MasterData> masterPacketManager;
 	private GameWindow window;
-
+	private boolean dancingMode = false;
 	private boolean started = true;
 
 	public XAtlas(Config config) {
@@ -87,25 +87,29 @@ public class XAtlas {
 				handlers[i] = new PlayerPacketHandler(this, playerPacketManager,
 						new PlayerData(config.username + " #" + (i + 1)));
 		window = new GameWindow(() -> getSelectedHandler().getData(),
-				masterHandler == null ? null : masterHandler.getData());
+				masterHandler == null ? null : masterHandler.getData(), this);
 	}
 
-	public boolean isStarted() {
-		return started;
+	public void doAction(Runnable action) {
+		try {
+			actions.put(action);
+		} catch (InterruptedException e) {}
 	}
 
 	public synchronized PlayerPacketHandler getSelectedHandler() {
 		return handlers[selectedHandler];
 	}
 
-	public synchronized PlayerPacketHandler selectHandler(int handlerID) {
-		PlayerPacketHandler handler = handlers[selectedHandler = handlerID];
-		handler.getData().log("Selected");
-		return handler;
+	public synchronized boolean isDancingModeEnabled() {
+		return dancingMode;
 	}
 
-	public synchronized PlayerPacketHandler selectNextHandler() {
-		PlayerPacketHandler handler = handlers[selectedHandler = (selectedHandler + 1) % handlers.length];
+	public boolean isStarted() {
+		return started;
+	}
+
+	public synchronized PlayerPacketHandler selectHandler(int handlerID) {
+		PlayerPacketHandler handler = handlers[selectedHandler = handlerID];
 		handler.getData().log("Selected");
 		return handler;
 	}
@@ -117,16 +121,16 @@ public class XAtlas {
 		return handler;
 	}
 
+	public synchronized PlayerPacketHandler selectNextHandler() {
+		PlayerPacketHandler handler = handlers[selectedHandler = (selectedHandler + 1) % handlers.length];
+		handler.getData().log("Selected");
+		return handler;
+	}
+
 	private void sleepNE(long millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (Exception e) {}
-	}
-
-	public void doAction(Runnable action) {
-		try {
-			actions.put(action);
-		} catch (InterruptedException e) {}
 	}
 
 	public void start() {
@@ -177,6 +181,9 @@ public class XAtlas {
 				} else {
 					PlayerPacketHandler packetHandler;
 
+					if (index.isButtonJustPressed(ControllerButton.Y)) {
+						toggleDancingMode();
+					}
 					if (index.isButtonJustPressed(ControllerButton.A)) {
 						packetHandler = selectNextHandler();
 					} else if (index.isButtonJustPressed(ControllerButton.B)) {
@@ -187,6 +194,27 @@ public class XAtlas {
 					PlayerData playerData = packetHandler.getData();
 
 					if (playerData.phase == GamePhase.PLAYING) {
+
+						// dancing mode
+
+						if (dancingMode) {
+
+							for (PlayerPacketHandler handler : handlers) {
+								if (handler == packetHandler)
+									continue; // pass our packet handler
+
+								if (Math.random() < 0.05)
+									handler.sendPacket(new PacketC05Shot());
+
+								double angle = Math.random() * 2 * Math.PI;
+								double x = Math.cos(angle);
+								double y = Math.sin(angle);
+
+								handler.sendPacket(new PacketC04Move(x, y, x, y));
+							}
+
+						}
+
 						float lx = index.getAxisState(ControllerAxis.LEFTX);
 						float ly = -index.getAxisState(ControllerAxis.LEFTY);
 						float rx = index.getAxisState(ControllerAxis.RIGHTX);
@@ -230,5 +258,12 @@ public class XAtlas {
 
 	public void stop() {
 		started = false;
+	}
+
+	public synchronized void toggleDancingMode() {
+		if ((dancingMode = !dancingMode))
+			System.out.println("Enabling dancing mode");
+		else
+			System.out.println("Disabling dancing mode");
 	}
 }
