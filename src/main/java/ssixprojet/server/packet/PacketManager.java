@@ -1,6 +1,7 @@
 package ssixprojet.server.packet;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.apache.commons.io.Charsets;
 
@@ -55,19 +56,30 @@ public class PacketManager<D> {
 	 * 
 	 * @param frame
 	 *            the frame
+	 * @param handle
+	 *            the packet handler
 	 * @return the packet or null if an error occurred
 	 */
-	public PacketServer<D> buildPacket(BinaryWebSocketFrame frame) {
+	public void buildPacket(BinaryWebSocketFrame frame, Consumer<PacketServer<D>> handle) {
 		ByteBuf buffer = frame.content();
 		try {
 			if (!buffer.isReadable(4))
-				return null;
-			int type = (int) buffer.readUnsignedInt(); // read u32
-
-			return buildPacket(type, buffer);
-		} catch (Exception e) {
-			return null;
-		}
+				return;
+			int count = (int) buffer.readInt();
+			for (int i = 0; i < count; i++) {
+				if (!buffer.isReadable(8))
+					return;
+				int type = buffer.readInt();
+				int size = buffer.readInt();
+				if (!buffer.isReadable(size))
+					return;
+				PacketServer<D> packet = buildPacket(type, buffer);
+				if (packet != null)
+					handle.accept(packet);
+				else
+					System.out.println("Weird packet id: " + type);
+			}
+		} catch (Exception e) {}
 	}
 
 	public PacketServer<D> buildPacket(int type, ByteBuf buffer) {

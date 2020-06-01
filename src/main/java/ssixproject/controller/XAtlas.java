@@ -234,6 +234,13 @@ public class XAtlas {
 						boolean r00 = rd < 0.1;
 						boolean l00 = ld < 0.1;
 						if (!l00 || !r00) {
+							if (r00) {
+								rx = 0;
+								ry = 0;
+							} else if (l00) {
+								lx = 0;
+								ly = 0;
+							}
 							if (!r00) {
 								packetHandler.sendPacket(new PacketC04Move(lx, ly, rx, ry));
 							} else

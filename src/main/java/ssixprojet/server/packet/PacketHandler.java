@@ -71,18 +71,13 @@ public abstract class PacketHandler<D> extends Thread {
 		}
 
 		protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) {
-			PacketServer<D> packet = packetManager.buildPacket(frame);
-			if (packet == null) {
-				return;
-			}
-			xAtlas.doAction(() -> {
-				// System.out.println(packet);
+			packetManager.buildPacket(frame, packet -> xAtlas.doAction(() -> {
 				try {
 					packet.handle(data);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			});
+			}));
 		}
 
 		@Override
