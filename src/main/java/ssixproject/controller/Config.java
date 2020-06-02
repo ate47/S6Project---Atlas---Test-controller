@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.Reader;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -40,7 +41,7 @@ public class Config {
 		Config cfg = loadFromFile();
 
 		JFrame frame = new JFrame("XAtlas");
-		frame.setSize(400, 520);
+		frame.setSize(400, 540);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -55,22 +56,28 @@ public class Config {
 		JTextField address = new JTextField(cfg.serverAddress);
 		address.setBounds(20, 160, 360, 40);
 
+		JLabel playerCountLabel = new JLabel("Nombre de joueurs");
+		playerCountLabel.setBounds(20, 200, 360, 60);
 		Integer[] count = new Integer[200];
 
 		for (int i = 0; i < count.length; i++)
 			count[i] = i + 1;
 
 		JComboBox<Integer> playerCount = new JComboBox<>(count);
-		playerCount.setBounds(20, 240, 360, 40);
+		playerCount.setBounds(20, 260, 360, 40);
 		playerCount.setSelectedIndex(cfg.playerCount > 0 && cfg.playerCount <= count.length ? cfg.playerCount - 1 : 0);
 
 		JLabel masterLabel = new JLabel("Mot de passe master");
-		masterLabel.setBounds(20, 320, 360, 40);
+		masterLabel.setBounds(20, 300, 360, 60);
 		JTextField masterPassword = new JTextField(cfg.masterPassword);
 		masterPassword.setBounds(20, 360, 360, 40);
 
+		JCheckBox fakeScreens = new JCheckBox("Faux écrans", cfg.fakeScreen);
+		fakeScreens.setBackground(Color.WHITE);
+		fakeScreens.setBounds(20, 400, 360, 60);
+
 		JButton launch = new JButton("Lancer");
-		launch.setBounds(20, 440, 360, 40);
+		launch.setBounds(20, 460, 360, 40);
 		launch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -92,6 +99,7 @@ public class Config {
 				Integer item = (Integer) playerCount.getSelectedItem();
 				cfg.playerCount = item == null ? 1 : item.intValue();
 				cfg.masterPassword = masterPassword.getText();
+				cfg.fakeScreen = fakeScreens.isSelected();
 				frame.setVisible(false);
 				synchronized (cfg) {
 					cfg.notify();
@@ -106,9 +114,11 @@ public class Config {
 		panel.add(username);
 		panel.add(addressLabel);
 		panel.add(address);
+		panel.add(playerCountLabel);
 		panel.add(playerCount);
 		panel.add(masterLabel);
 		panel.add(masterPassword);
+		panel.add(fakeScreens);
 		panel.add(launch);
 
 		frame.setContentPane(panel);
@@ -125,6 +135,7 @@ public class Config {
 		}
 	}
 
+	public boolean fakeScreen = false;
 	public String serverHost = "127.0.0.1";
 	public int serverPort = 2080;
 	public String serverAddress = serverHost + ":" + serverPort;

@@ -16,6 +16,7 @@ import ssixproject.client.MasterData;
 import ssixproject.client.PlayerData;
 import ssixproject.client.PlayerType;
 import ssixproject.controller.window.GameWindow;
+import ssixprojet.server.packet.FakeScreenPacketHandler;
 import ssixprojet.server.packet.MasterPacketHandler;
 import ssixprojet.server.packet.PacketManager;
 import ssixprojet.server.packet.PlayerPacketHandler;
@@ -41,6 +42,7 @@ public class XAtlas {
 
 	private final BlockingQueue<Runnable> actions = new ArrayBlockingQueue<>(1024);
 	public final PlayerPacketHandler[] handlers;
+	public final FakeScreenPacketHandler[] fakeScreenHandlers;
 	public final MasterPacketHandler masterHandler;
 	private int selectedHandler = 0;
 	private final ControllerManager manager = new ControllerManager();
@@ -86,6 +88,14 @@ public class XAtlas {
 			for (int i = 0; i < handlers.length; i++)
 				handlers[i] = new PlayerPacketHandler(this, playerPacketManager,
 						new PlayerData(config.username + " #" + (i + 1)));
+		if (config.fakeScreen) {
+			fakeScreenHandlers = new FakeScreenPacketHandler[config.playerCount];
+			for (int i = 0; i < fakeScreenHandlers.length; i++)
+				fakeScreenHandlers[i] = new FakeScreenPacketHandler(this);
+
+		} else
+			fakeScreenHandlers = new FakeScreenPacketHandler[0];
+
 		window = new GameWindow(() -> getSelectedHandler().getData(),
 				masterHandler == null ? null : masterHandler.getData(), this);
 	}
@@ -137,6 +147,10 @@ public class XAtlas {
 		window.setVisible(true);
 		for (PlayerPacketHandler packetHandler : handlers)
 			packetHandler.start();
+		
+		for (FakeScreenPacketHandler packetHandler : fakeScreenHandlers)
+			packetHandler.start();
+		
 		if (masterHandler != null)
 			masterHandler.start();
 
